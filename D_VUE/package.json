@@ -1,0 +1,32 @@
+{
+  "name": "d-vue",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.2.1",
+    "@fortawesome/free-brands-svg-icons": "^6.2.1",
+    "@fortawesome/free-regular-svg-icons": "^6.2.1",
+    "@fortawesome/free-solid-svg-icons": "^6.2.1",
+    "@fortawesome/vue-fontawesome": "^3.0.2",
+    "chart.js": "^4.1.2",
+    "highcharts-vue": "^1.4.0",
+    "mpvue-calendar": "^3.0.1",
+    "v-calendar": "^3.0.0-alpha.8",
+    "vue": "^3.2.45",
+    "vue-chartjs": "^5.2.0",
+    "vue-router": "^4.1.6",
+    "vue-sweet-calendar": "^0.4.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.0.0",
+    "autoprefixer": "^10.4.13",
+    "postcss": "^8.4.21",
+    "tailwindcss": "^3.2.4",
+    "vite": "^4.0.0"
+  }
+}

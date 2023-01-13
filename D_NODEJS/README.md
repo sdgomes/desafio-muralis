@@ -1,0 +1,1 @@
+INSERT INTO tipos_pagamento (tipo) VALUES ("CREDITO"), ("DEBITO"), ("PIX"), ("DINHEIRO");
