@@ -5,22 +5,31 @@ const EnderecoDao = require("../classes/DAO/EnderecoDao");
 const Despesa = require("../classes/Despesa");
 
 exports.index = async (req, res) => {
-    /** START DB */
     const mysql = Database.getInstance();
 
     const { id } = req.body;
-    /** Starta Objetos */
     const despesa = new Despesa(req.body);
 
-    /** Object DAO */
     const despesaDao = new DespesaDao(mysql);
     const categoriaDao = new CategoriaDao(mysql);
     const enderecoDao = new EnderecoDao(mysql);
 
-    /** Busca CEP para alteração se informado */
     if (despesa.endereco.cep) {
         await fetch(`https://viacep.com.br/ws/${despesa.endereco.cep.replace(/[^0-9]/g, "")}/json`)
-            .then((response) => response.json()).then((data) => despesa.completeAddress(data));
+            .then((response) => response.json()).then((data) => {
+                if (data.hasOwnProperty("erro")) {
+                    return res.status(500).json({
+                        data: "CEP Inváido",
+                        success: false,
+                    });
+                }
+                despesa.completeAddress(data)
+            }).catch((error) => {
+                return res.status(500).json({
+                    data: "CEP Inváido",
+                    success: false,
+                });
+            });
     }
 
     despesaDao.findById(id).then((result) => {
@@ -45,14 +54,33 @@ exports.index = async (req, res) => {
         });
         despesa.comparison(target);
 
-        /** Atualizações */
-        categoriaDao.update(despesa.categoria, result.categoria_id);
-        enderecoDao.update(despesa.endereco, result.endereco_id);
-        despesaDao.update(despesa, result.id);
+        categoriaDao.update(despesa.categoria, result.categoria_id).catch((error) => {
+            return res.status(500).json({
+                data: error,
+                success: false,
+            });
+        });
+        enderecoDao.update(despesa.endereco, result.endereco_id).catch((error) => {
+            return res.status(500).json({
+                data: error,
+                success: false,
+            });
+        });
+        despesaDao.update(despesa, result.id).catch((error) => {
+            return res.status(500).json({
+                data: error,
+                success: false,
+            });
+        });
 
         return res.status(201).json({
             data: despesa,
             success: true,
+        });
+    }).catch((error) => {
+        return res.status(500).json({
+            data: error,
+            success: false,
         });
     });
 }

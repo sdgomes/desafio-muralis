@@ -3,52 +3,40 @@ const CategoriaDao = require("../classes/DAO/CategoriaDao");
 const DespesaDao = require("../classes/DAO/DespesaDao");
 const EnderecoDao = require("../classes/DAO/EnderecoDao");
 const Despesa = require("../classes/Despesa");
+const { validFields } = require("../util");
 
 exports.index = async (req, res) => {
-    /** START DB */
     const mysql = Database.getInstance();
 
     const { id } = req.body;
-    /** Starta Objetos */
     const despesa = new Despesa(req.body);
 
-    /** Object DAO */
     const despesaDao = new DespesaDao(mysql);
     const categoriaDao = new CategoriaDao(mysql);
     const enderecoDao = new EnderecoDao(mysql);
 
-    /** Busca CEP para alteração se informado */
     if (despesa.endereco.cep) {
         await fetch(`https://viacep.com.br/ws/${despesa.endereco.cep.replace(/[^0-9]/g, "")}/json`)
-            .then((response) => response.json()).then((data) => despesa.completeAddress(data));
+            .then((response) => response.json()).then((data) => {
+                if (data.hasOwnProperty("erro")) {
+                    return res.status(500).json({
+                        data: "CEP Inváido",
+                        success: false,
+                    });
+                }
+                despesa.completeAddress(data)
+            }).catch((error) => {
+                return res.status(500).json({
+                    data: "CEP Inváido",
+                    success: false,
+                });
+            });
     }
 
-    /** Válida se todos os campos foram informados */
-    var isValid = true;
-    for (const key in despesa) {
-        if (Object.hasOwnProperty.call(despesa, key)) {
-            const element = despesa[key];
-            if (typeof element === "object" && element !== null) {
-                for (const keyIntern in element) {
-                    if (Object.hasOwnProperty.call(element, keyIntern)) {
-                        const elementIntern = element[keyIntern];
-                        if (!elementIntern && keyIntern != "complemento") {
-                            isValid = false;
-                        }
-                    }
-                }
-            } else {
-                if (!element) {
-                    isValid = false;
-                }
-            }
-        }
-    }
-
-    if (!isValid) {
-        return res.status(201).json({
+    if (!validFields(despesa)) {
+        return res.status(500).json({
             data: "Erro algum parametro não foi passado corretamnete",
-            success: true,
+            success: false,
         });
     }
 
@@ -61,6 +49,11 @@ exports.index = async (req, res) => {
         return res.status(201).json({
             data: despesa,
             success: true,
+        });
+    }).catch((error) => {
+        return res.status(500).json({
+            data: error,
+            success: false,
         });
     });
 };

@@ -9,10 +9,6 @@ module.exports = class Endereco {
     this.uf = uf;
   }
 
-  /** Compara dados do banco com dados atuais
-   * para fazer update apenas das informações recebidas pela 
-   * requisição
-   */
   comparison({ cep, numero, logradouro, complemento, bairro, localidade, uf }) {
     this.cep = this.cep ?? cep;
     this.numero = this.numero ?? numero;

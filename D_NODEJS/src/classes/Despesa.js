@@ -2,19 +2,15 @@ const Categoria = require("./Categoria");
 const Endereco = require("./Endereco");
 
 module.exports = class Despesa {
-  constructor({ endereco, valor, descricao, tipoPagamento, categoria }) {
-    this.endereco = new Endereco(endereco ?? {});
+  constructor({ categoria, endereco, valor, descricao, tipoPagamento, data }) {
     this.valor = valor;
     this.descricao = descricao;
-    this.data = new Date();
+    this.data = data ?? new Date();
     this.tipoPagamento = tipoPagamento;
+    this.endereco = new Endereco(endereco ?? {});
     this.categoria = new Categoria(categoria ?? {});
   }
 
-  /** Compara dados do banco com dados atuais
-  * para fazer update apenas das informações recebidas pela 
-  * requisição
-  */
   comparison({ endereco, valor, descricao, tipoPagamento, categoria }) {
     this.valor = this.valor ?? valor;
     this.descricao = this.descricao ?? descricao;

@@ -10,10 +10,13 @@ module.exports = class DespesaDao {
         this._connection.query(`INSERT INTO ${this.table} (valor, data_compra, descricao, tipo_pagamento_id, categoria_id ) VALUES (?, ?, ?, ?, ?);`,
           [_store.valor.replace(/\./g, "").replace(/\,/g, "."), _store.data, _store.descricao, tipo_pagamento_id, _store.categoria.id,],
           (err, results, fields) => {
-            if (err) throw err;
-            else console.log("Inserted " + results.affectedRows + " row(s).");
+            if (err) {
+              reject(err)
+            }
             resolve(results.insertId);
           });
+      }).catch((error) => {
+        reject(error);
       });
     });
   }
@@ -24,9 +27,13 @@ module.exports = class DespesaDao {
         this._connection.query(`UPDATE ${this.table} SET valor=?, descricao=?, tipo_pagamento_id=? WHERE id = ?`,
           [_store.valor.replace(/\./g, "").replace(/\,/g, "."), _store.descricao, tipo_pagamento_id, id,],
           (err, results, fields) => {
-            if (err) throw err;
-            else console.log("Updated " + results.affectedRows + " row(s).");
+            if (err) {
+              reject(err)
+            }
+            console.log("Updated " + results.affectedRows + " row(s).");
           });
+      }).catch((error) => {
+        reject(error);
       });
     });
   }
@@ -34,8 +41,10 @@ module.exports = class DespesaDao {
   delete(id) {
     return new Promise((resolve, reject) => {
       this._connection.query(`DELETE FROM ${this.table}  WHERE id = ?`, [id], (err, results, fields) => {
-        if (err) throw err;
-        else console.log("Deleted " + results.affectedRows + " row(s).");
+        if (err) {
+          reject(err)
+        }
+        console.log("Deleted " + results.affectedRows + " row(s).");
       });
     });
   }
@@ -44,8 +53,13 @@ module.exports = class DespesaDao {
     return new Promise((resolve, reject) => {
       this._connection.query("SELECT id FROM tipos_pagamento WHERE tipo = ?",
         [this.standardizePayment(tipoPagamento)], (err, results, fields) => {
-          if (err) throw err;
-          resolve(results[0].id);
+          if (err) {
+            reject(err)
+          } else if (results[0] == undefined) {
+            reject("Tipo de pagamento não aceito")
+          } else {
+            resolve(results[0].id);
+          }
         });
     });
   }
@@ -61,12 +75,16 @@ module.exports = class DespesaDao {
       INNER JOIN tipos_pagamento TP ON TP.id = DS.tipo_pagamento_id 
       WHERE MONTH(DS.data_compra) = MONTH(NOW()) ORDER BY DS.id DESC`,
         (err, results, fields) => {
-          if (err) throw err;
-          else console.log("Selected " + results.length + " row(s).");
-          for (var i = 0; i < results.length; i++) {
-            despesas.push(results[i]);
+          if (err) {
+            reject(err)
           }
-          resolve(despesas);
+          else {
+            console.log("Selected " + results.length + " row(s).");
+            for (var i = 0; i < results.length; i++) {
+              despesas.push(results[i]);
+            }
+            resolve(despesas);
+          }
         });
     });
   }
@@ -82,20 +100,20 @@ module.exports = class DespesaDao {
       INNER JOIN tipos_pagamento TP ON TP.id = DS.tipo_pagamento_id 
       WHERE DS.id = ? ORDER BY DS.id DESC`,
         [id], (err, results, fields) => {
-          if (err) throw err;
-          else console.log("Selected " + results.length + " row(s).");
-          for (var i = 0; i < results.length; i++) {
-            despesa = results[i];
+          if (err) {
+            reject(err)
           }
-          resolve(despesa);
+          else {
+            for (var i = 0; i < results.length; i++) {
+              despesa = results[i];
+            }
+            resolve(despesa);
+          }
         });
     });
   }
 
   standardizePayment(tipoPagamento) {
-    /** Padroniza tipo de pagamento
-     * para maiúscula e remove acentuação
-     */
     var tPagamento = tipoPagamento.toUpperCase();
     tPagamento = tPagamento.normalize("NFD");
     tPagamento = tPagamento.replace(/[\u0300-\u036f]/g, "");

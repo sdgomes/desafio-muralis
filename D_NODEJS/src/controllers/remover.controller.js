@@ -4,12 +4,10 @@ const DespesaDao = require("../classes/DAO/DespesaDao");
 const EnderecoDao = require("../classes/DAO/EnderecoDao");
 
 exports.index = async (req, res) => {
-    /** START DB */
     const mysql = Database.getInstance();
 
     const { id } = req.body;
 
-    /** Object DAO */
     const despesaDao = new DespesaDao(mysql);
     const categoriaDao = new CategoriaDao(mysql);
     const enderecoDao = new EnderecoDao(mysql);
@@ -22,6 +20,11 @@ exports.index = async (req, res) => {
         return res.status(201).json({
             data: "Entidade apagada com sucesso",
             success: true,
+        });
+    }).catch((error) => {
+        return res.status(500).json({
+            data: error,
+            success: false,
         });
     });
 };

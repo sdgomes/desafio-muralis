@@ -8,8 +8,9 @@ module.exports = class CategoriaDao {
     return new Promise((resolve, reject) => {
       this._connection.query(`INSERT INTO ${this.table} (nome, descricao) VALUES (?, ?);`,
         [_store.nome, _store.descricao], (err, results, fields) => {
-          if (err) throw err;
-          else console.log("Inserted " + results.affectedRows + " row(s).");
+          if (err) {
+            reject(err)
+          }
           resolve(results.insertId);
         });
     });
@@ -19,8 +20,9 @@ module.exports = class CategoriaDao {
     return new Promise((resolve, reject) => {
       this._connection.query(`UPDATE ${this.table} SET nome=?, descricao=? WHERE id = ?`,
         [_store.nome, _store.descricao, id], (err, results, fields) => {
-          if (err) throw err;
-          else console.log("Updated " + results.affectedRows + " row(s).");
+          if (err) {
+            reject(err)
+          }
         });
     });
   }
@@ -28,8 +30,9 @@ module.exports = class CategoriaDao {
   delete(id) {
     return new Promise((resolve, reject) => {
       this._connection.query(`DELETE FROM ${this.table} WHERE id = ?`, [id], (err, results, fields) => {
-        if (err) throw err;
-        else console.log("Deleted " + results.affectedRows + " row(s).");
+        if (err) {
+          reject(err)
+        }
       });
     });
   }

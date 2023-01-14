@@ -11,8 +11,9 @@ module.exports = class EnderecoDao {
         [_store.cep.replace(/[^0-9]/g, ""), _store.numero, _store.logradouro, _store.complemento,
         _store.bairro, _store.localidade, _store.uf, despesa_id],
         (err, results, fields) => {
-          if (err) throw err;
-          else console.log("Inserted " + results.affectedRows + " row(s).");
+          if (err) {
+            reject(err)
+          }
           resolve(results);
         });
     });
@@ -25,8 +26,9 @@ module.exports = class EnderecoDao {
         [_store.cep.replace(/[^0-9]/g, ""), _store.numero, _store.logradouro, _store.complemento,
         _store.bairro, _store.localidade, _store.uf, id,],
         (err, results, fields) => {
-          if (err) throw err;
-          else console.log("Updated " + results.affectedRows + " row(s).");
+          if (err) {
+            reject(err)
+          }
         });
     });
   }
@@ -34,8 +36,9 @@ module.exports = class EnderecoDao {
   delete(id) {
     return new Promise((resolve, reject) => {
       this._connection.query(`DELETE FROM ${this.table}  WHERE id = ?`, [id], (err, results, fields) => {
-        if (err) throw err;
-        else console.log("Deleted " + results.affectedRows + " row(s).");
+        if (err) {
+          reject(err)
+        }
       });
     });
   }
