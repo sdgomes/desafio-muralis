@@ -13,7 +13,6 @@ Application made for the challenge proposed by **Muralis Tecnologia**
 Install the dependencies via npm*
 
 ```bash
-  git clone git@github.com:sdgomes/desafio-muralis.git
   cd desafio-muralis/D_NODEJS
   npm install
 ```
